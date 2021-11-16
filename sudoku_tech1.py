@@ -23,18 +23,6 @@ def value_from_grid(grid):
             row = []
     return value
 
-def execution(value):
-    copy_value = []
-    copy_value = copy.deepcopy(value)
-
-    if answer(copy_value):
-        return copy_value
-
-    if value == solver(copy_value):
-        return copy_value
-
-    execution(solver(value))
-
 def solver(value):
     x = y = 0
     i = 1
@@ -52,10 +40,10 @@ def solver(value):
             for x in range(9):
                 solver_group(value, x, y, i)
 
+    if solver_row(value, y, i) or solver_column(value, x, i) or solver_group(value, x, y, i):
+        solver(value)
+
     return value
-
-
-
 
 def solver_row(value, y, i):
     zero_count = 0
@@ -67,14 +55,11 @@ def solver_row(value, y, i):
             
     if zero_count == 1:
         for _x in range(9):
-            number.remove(value[y][_x])
+            if check(value, _x, y, i):
+                value[y][_x] = i
+                return True
 
-        for _x in range(9):
-            if value[y][_x] == 0:
-                value[y][_x] = number[0]
-                return value
-
-    return value
+    return False
 
 def solver_column(value, x, i):
     zero_count = 0
@@ -86,13 +71,10 @@ def solver_column(value, x, i):
 
     if zero_count == 1:
         for _y in range(9):
-            number.remove(value[_y][x])
-        
-        for _y in range(9):
-            if value[_y][x] == 0:
-                value[_y][x] = number[0]
-                return value
-    return value
+            if check(value, x, _y, i):
+                value[_y][x] = i
+                return True
+    return False
 
 def solver_group(value, x, y, i):
     zero_count = 0
@@ -109,8 +91,8 @@ def solver_group(value, x, y, i):
             for _x in range (xbase, xbase + 3):
                 if check(value, _x, _y, i):
                     value[_y][_x] = i
-                    return value
-    return value
+                    return True
+    return False
             
 #盤面に空きマスが無ければtrueを返す
 def answer(value):
@@ -152,7 +134,7 @@ def block(value, x, y, i):
             for _y in range(ybase, ybase + 3)
                 for _x in range(xbase, xbase + 3))
 
-value = value_from_grid('600014730130257600975836412009683201480072396263149057897460023312798564000320978')
+value = value_from_grid('628914730130257680975836412009683241481572396263149857897465123312798564006321978')
 
 for _y in range(0, 9):
     for _x in range(0, 9):
@@ -161,7 +143,7 @@ for _y in range(0, 9):
 
 print('\n')
 
-execution(value)
+solver(value)
 
 for _y in range(0, 9):
     for _x in range(0, 9):
